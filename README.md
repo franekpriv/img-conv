@@ -49,3 +49,6 @@ conv --info banner.webp     # show metadata
 conv --formats              # list supported formats
 conv --doctor               # verify environment
 ```
+
+## Also it's vibecoded!
+It's just a simple tool for me, just wanted to test out OpenAI's codex.
