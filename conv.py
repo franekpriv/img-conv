@@ -18,6 +18,8 @@ from PIL import features as pillow_features
 
 VERSION = "0.3"
 SUPPORTED_FORMATS = {"png", "webp", "jpeg", "avif"}
+RESERVED_KEYWORDS = {"formats", "info", "version", "doctor"}
+NOT_IMAGE_MSG = "Pillow could not identify the input file as an image."
 HELP_TEXT = """Conv-rt help:
 
 Converting a file to another format:
@@ -113,7 +115,7 @@ def convert_image(input_path: Path, target_format: str) -> Path:
     return output_path
 
 
-def get_image_info(input_path: Path) -> dict:
+def get_image_info(input_path: Path) -> dict[str, str | int]:
     """Return basic image info."""
     if not input_path.exists():
         raise FileNotFoundError(f"Input file not found: {input_path}")
@@ -172,7 +174,7 @@ def show_image_info(input_path: Path) -> int:
         print_error(ERROR_CODES["input_missing"], str(exc))
         return 1
     except UnidentifiedImageError:
-        print_error(ERROR_CODES["not_image"], "Pillow could not identify the input file as an image.")
+        print_error(ERROR_CODES["not_image"], NOT_IMAGE_MSG)
         return 1
     except OSError as exc:
         print_error(ERROR_CODES["read_failed"], f"Failed to read image: {exc}")
@@ -214,8 +216,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     input_file = args.input_file or args.input_file_opt
     target_format = args.target_format or args.target_format_opt
 
-    reserved = {"formats", "info", "version", "doctor"}
-    if input_file in reserved and not target_format:
+    if input_file in RESERVED_KEYWORDS and not target_format:
         print_error(
             ERROR_CODES["reserved_keyword"],
             f"'{input_file}' is a reserved keyword. Use --{input_file} instead.",
@@ -239,7 +240,7 @@ def main(argv: Iterable[str] | None = None) -> int:
         print_error(ERROR_CODES["unsupported_format"], str(exc))
         return 1
     except UnidentifiedImageError:
-        print_error(ERROR_CODES["not_image"], "Pillow could not identify the input file as an image.")
+        print_error(ERROR_CODES["not_image"], NOT_IMAGE_MSG)
         return 1
     except OSError as exc:
         print_error(ERROR_CODES["convert_failed"], f"Failed to convert image: {exc}")

@@ -1,60 +1,79 @@
 # conv
 
-`conv` is a tiny Python CLI that leans on Pillow to inspect or convert raster images between the commonly supported formats.
+`conv` is a small Python CLI for image conversion and image info output.
 
 ## Requirements
 
-- Python 3.8+ (any recent 3.x)
+- Python 3.8+
 - [Pillow](https://python-pillow.org/)
 
-Install Pillow once so `conv` can import it:
+## Install (Linux)
+
+From the project root:
 
 ```bash
-pip install pillow
+chmod +x install_linux.sh
+./install_linux.sh
+```
+
+Installer behavior:
+
+- Checks Linux + `python3`.
+- If Pillow is missing, asks before running `pip3 install --user pillow`.
+- Installs the command to `~/.local/bin/conv`.
+- Warns if `~/.local/bin` is not on `PATH`.
+
+Verify:
+
+```bash
+conv --version
+```
+
+If `~/.local/bin` is not on `PATH`, add:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
 ```
 
 ## Usage
 
 ```bash
-# conversion with positional arguments
+# Convert
 conv input.webp png
-
-# the same conversion using flags
 conv -i input.webp -f png
 
-# metadata/info display (any single path is treated as `--info`)
+# Info
 conv image.png
-
-# explicit info flag
 conv --info image.png
 ```
 
-### Flags & Commands
+## Commands
 
 | Command | Description |
-|--------|-------------|
-| `conv INPUT FORMAT` <br> `conv -i INPUT -f FORMAT` | Convert the file to the requested format (png, webp, jpeg, avif). Output is written next to the input file with the new extension. |
-| `conv --info FILE` or `conv FILE` | Show metadata and basic diagnostics for the image.
-| `conv --formats` | Print the list of formats supported by this build of Pillow.
-| `conv --version` | Show the CLI version.
-| `conv --doctor` | Check the environment for Pillow and optional features such as AVIF support. |
+|---|---|
+| `conv INPUT FORMAT` | Convert image format. |
+| `conv -i INPUT -f FORMAT` | Convert image format (flag form). |
+| `conv FILE` | Show image info. |
+| `conv --info FILE` | Show image info (explicit flag). |
+| `conv --formats` | List supported output formats. |
+| `conv --doctor` | Print environment diagnostics. |
+| `conv --version` | Print CLI version. |
+| `conv -h` | Show custom help text. |
 
-Notes:
+## Notes
 
-- JPEG targets strip alpha channels automatically (images are converted to RGB).
-- AVIF conversions only work when Pillow is compiled with AVIF codecs; run `conv --doctor` to verify.
-- Errors clearly report issues such as missing files, unsupported formats, or unreadable images.
+- Supported formats: `png`, `webp`, `jpeg`, `avif` (`jpg` aliases to `jpeg`).
+- JPEG output auto-converts alpha images to RGB.
+- AVIF depends on your Pillow build (`conv --doctor`).
+- Output file is written beside the input with the new extension.
+- Success and error outputs include numeric codes; see `error_codes.md`.
 
 ## Examples
 
 ```bash
-conv photo.avif jpeg        # convert AVIF to JPEG
-conv sprite.png webp        # convert PNG to WebP
-conv --info banner.webp     # show metadata
-conv --formats              # list supported formats
-conv --doctor               # verify environment
+conv photo.avif jpeg
+conv sprite.png webp
+conv --info banner.webp
+conv --formats
+conv --doctor
 ```
-
-## Why it exists?
-
-This is a small tool built while experimenting with Codex
