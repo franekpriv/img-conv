@@ -1,44 +1,49 @@
 # conv
 
-Small Python CLI for converting images with Pillow.
+`conv` is a tiny Python CLI that leans on Pillow to inspect or convert raster images between the commonly supported formats.
 
-## Install
+## Requirements
+
+- Python 3.8+ (any recent 3.x)
+- [Pillow](https://python-pillow.org/)
+
+Install Pillow once so `conv` can import it:
 
 ```bash
 pip install pillow
 ```
 
-## Quick Start
+## Usage
 
 ```bash
-# convert (positional)
+# conversion with positional arguments
 conv input.webp png
 
-# convert (flags)
+# the same conversion using flags
 conv -i input.webp -f png
 
-# quick info (single arg)
+# metadata/info display (any single path is treated as `--info`)
 conv image.png
 
 # explicit info flag
 conv --info image.png
 ```
 
-## Commands
+### Flags & Commands
 
-- Convert: `conv INPUT FORMAT` or `conv -i INPUT -f FORMAT`
-- Info: `conv --info FILE` or `conv FILE` (single arg)
-- Formats: `conv --formats`
-- Version: `conv --version`
-- Doctor: `conv --doctor`
+| Command | Description |
+|--------|-------------|
+| `conv INPUT FORMAT` <br> `conv -i INPUT -f FORMAT` | Convert the file to the requested format (png, webp, jpeg, avif). Output is written next to the input file with the new extension. |
+| `conv --info FILE` or `conv FILE` | Show metadata and basic diagnostics for the image.
+| `conv --formats` | Print the list of formats supported by this build of Pillow.
+| `conv --version` | Show the CLI version.
+| `conv --doctor` | Check the environment for Pillow and optional features such as AVIF support. |
 
-## Behavior
+Notes:
 
-- Supported formats: png, webp, jpeg, avif (jpg aliases to jpeg).
-- Output is written next to the input with the new extension.
-- JPEG targets auto-convert alpha images to RGB.
-- AVIF works if your Pillow build has AVIF support (`conv --doctor` to check).
-- Errors are clear for missing files, bad formats, or unreadable images.
+- JPEG targets strip alpha channels automatically (images are converted to RGB).
+- AVIF conversions only work when Pillow is compiled with AVIF codecs; run `conv --doctor` to verify.
+- Errors clearly report issues such as missing files, unsupported formats, or unreadable images.
 
 ## Examples
 
@@ -50,5 +55,6 @@ conv --formats              # list supported formats
 conv --doctor               # verify environment
 ```
 
-## Also it's vibecoded!
-It's just a simple tool for me, just wanted to test out OpenAI's codex.
+## Why it exists?
+
+This is a small tool built while experimenting with Codex
