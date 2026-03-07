@@ -17,10 +17,10 @@ Use these codes to quickly identify what happened when running `conv`.
 | Code | When it appears | Description | Simple fix |
 |---|---|---|---|
 | `06` | Missing input file path | Input file does not exist at the given path. | Check file path and filename, then retry. |
-| `07` | Invalid/non-image file | Pillow cannot identify the file as an image. | Use a valid image file (png/webp/jpeg/avif source). |
+| `07` | Invalid/non-image file | Pillow cannot identify the file as an image. | Use a valid image file (png/webp/jpeg/avif/gif source). |
 | `08` | Read failure during info | File exists but metadata read failed (permissions/corruption). | Check file permissions and integrity, then retry. |
 | `09` | Reserved keyword used as file | `formats/info/version/doctor` was used as positional file input. | Use the explicit flag (for example `--formats`) or a real file path. |
 | `10` | Missing required args | Conversion mode was used without both input and target format. | Run `conv INPUT FORMAT` or `conv -i INPUT -f FORMAT`. |
-| `11` | Unsupported output format | Requested target format is not supported. | Use one of: `png`, `webp`, `jpeg`, `avif`. |
+| `11` | Unsupported output format | Requested target format is not supported. | Use one of: `png`, `webp`, `jpeg`, `avif`, `gif`. |
 | `12` | Convert write/process failure | Conversion failed while saving/processing image. | Check destination permissions, disk space, and source file validity. |
 | `13` | Invalid CLI arguments | CLI arguments are malformed (for example missing value for `--info`). | Run `conv -h` and retry with valid argument syntax. |

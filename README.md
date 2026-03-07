@@ -62,8 +62,9 @@ conv --info image.png
 
 ## Notes
 
-- Supported formats: `png`, `webp`, `jpeg`, `avif` (`jpg` aliases to `jpeg`).
+- Supported formats: `png`, `webp`, `jpeg`, `avif`, `gif` (`jpg` aliases to `jpeg`).
 - JPEG output auto-converts alpha images to RGB.
+- Animated GIF/WebP sources stay animated when converting to `gif` or `webp`.
 - AVIF depends on your Pillow build (`conv --doctor`).
 - Output file is written beside the input with the new extension.
 - Success and error outputs include numeric codes; see `error_codes.md`.
@@ -73,6 +74,7 @@ conv --info image.png
 ```bash
 conv photo.avif jpeg
 conv sprite.png webp
+conv clip.webp gif
 conv --info banner.webp
 conv --formats
 conv --doctor

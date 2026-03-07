@@ -12,12 +12,13 @@ import sys
 from pathlib import Path
 from typing import Iterable
 
-from PIL import Image, UnidentifiedImageError, __version__ as pillow_version
+from PIL import Image, ImageSequence, UnidentifiedImageError, __version__ as pillow_version
 from PIL import features as pillow_features
 
 
-VERSION = "0.3"
-SUPPORTED_FORMATS = {"png", "webp", "jpeg", "avif"}
+VERSION = "0.4"
+SUPPORTED_FORMATS = {"png", "webp", "jpeg", "avif", "gif"}
+ANIMATED_TARGET_FORMATS = {"gif", "webp"}
 RESERVED_KEYWORDS = {"formats", "info", "version", "doctor"}
 NOT_IMAGE_MSG = "Pillow could not identify the input file as an image."
 HELP_TEXT = """Conv-rt help:
@@ -85,6 +86,34 @@ def build_output_path(input_path: Path, target_format: str) -> Path:
     return input_path.with_suffix(f".{target_format}")
 
 
+def prepare_output_image(
+    img: Image.Image, target_format: str
+) -> tuple[Image.Image, dict[str, object]]:
+    """Prepare an image and save kwargs for the requested output format."""
+    if target_format == "jpeg" and img.mode in {"RGBA", "LA", "P"}:
+        return img.convert("RGB"), {}
+
+    if getattr(img, "is_animated", False) and target_format in ANIMATED_TARGET_FORMATS:
+        frames = [frame.copy() for frame in ImageSequence.Iterator(img)]
+        save_kwargs: dict[str, object] = {
+            "save_all": True,
+            "append_images": frames[1:],
+        }
+
+        for key in ("duration", "loop"):
+            if key in img.info:
+                save_kwargs[key] = img.info[key]
+
+        if target_format == "gif":
+            for key in ("background", "disposal", "transparency"):
+                if key in img.info:
+                    save_kwargs[key] = img.info[key]
+
+        return frames[0], save_kwargs
+
+    return img, {}
+
+
 def convert_image(input_path: Path, target_format: str) -> Path:
     """Convert the image and return output path.
 
@@ -107,10 +136,8 @@ def convert_image(input_path: Path, target_format: str) -> Path:
     output_path = build_output_path(input_path, target_format)
 
     with Image.open(input_path) as img:
-        # Ensure conversion for formats that don't support alpha
-        if target_format == "jpeg" and img.mode in {"RGBA", "LA", "P"}:
-            img = img.convert("RGB")
-        img.save(output_path, format=target_format.upper())
+        save_image, save_kwargs = prepare_output_image(img, target_format)
+        save_image.save(output_path, format=target_format.upper(), **save_kwargs)
 
     return output_path
 
@@ -161,7 +188,7 @@ def parse_args(argv: Iterable[str]) -> argparse.Namespace:
         "-f",
         "--format",
         dest="target_format_opt",
-        help="Target format: png, webp, jpeg, avif",
+        help="Target format: png, webp, jpeg, avif, gif",
     )
 
     return parser.parse_args(list(argv))
